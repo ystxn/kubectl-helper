@@ -18,7 +18,7 @@ unavailable.
 |------|-----------|-------|
 | `bash` or `zsh` | everything | the script refuses to load under other shells |
 | `kubectl` | everything | must already be installed and configured |
-| `jq` | `ks`, `kcm`, `kl` | not auto-installed; install it yourself if you use these |
+| `jq` | `ks`, `kcm`, `kl` | **auto-installed** on source (via package manager) |
 | `kubectl-neat` | `kn` | **auto-installed** on source (direct binary download) |
 | `bat` | nicer output from `kn`, `kcm` | **auto-installed** on source; falls back to `cat` if unavailable |
 

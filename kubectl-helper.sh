@@ -106,9 +106,11 @@ _kn_ensure_neat() {
 _kn_pager() {
   if command -v bat >/dev/null 2>&1; then bat --style=plain -l=yaml --paging=never; else cat; fi
 }
+_kn_ensure_jq() { command -v jq >/dev/null 2>&1 || _kn_pm_install jq; }
 kn-setup() {
   _kn_pkgmgr >/dev/null || { echo "kn-setup: no supported package manager (apk/apt/brew); skipping" >&2; return 1; }
   _kn_ensure_bat  || echo "kn-setup: bat unavailable; kn/kcm will fall back to cat" >&2
+  _kn_ensure_jq   || echo "kn-setup: could not install jq; ks/kcm/kl need it" >&2
   _kn_ensure_neat || echo "kn-setup: could not install kubectl-neat" >&2
 }
 kn-setup
