@@ -1,15 +1,18 @@
-# Kubernetes Stuff
+# https://github.com/ystxn/kubectl-helper
 _CURRENT_SHELL=$(ps -p $$ -o comm=)
 case "$_CURRENT_SHELL" in zsh|bash) ;; *) echo "k8s: requires bash or zsh" >&2; return 2>/dev/null || exit 1 ;; esac
 
 export ns=$(kubectl config view --minify -o jsonpath='{..namespace}' 2>/dev/null)
 export ns=${ns:-default}
+
+unalias k ns kc pod kp kpw kd kn ks kr kcm kb ke kew kl kf 2>/dev/null || :
 k() { kubectl "$@"; }
 
 eval "$(k completion $_CURRENT_SHELL)"
 
 case "$_CURRENT_SHELL" in
   zsh)
+    compdef k=kubectl   # k is a function now, so it needs kubectl completion wired up explicitly
     _k8s_completion() {
       local -a resources
       resources=($(kubectl get $1 -n $ns --no-headers | awk '{print $1}'))
@@ -35,6 +38,7 @@ case "$_CURRENT_SHELL" in
     compdef '_k8s_context_completion' kc
     ;;
   bash)
+    complete -o default -F __start_kubectl k   # k is a function now, so it needs kubectl completion wired up explicitly
     _k8s_completion() {
       local resources
       resources=$(kubectl get $1 -n $ns --no-headers 2>/dev/null | awk '{print $1}')
@@ -115,7 +119,6 @@ kn-setup() {
 }
 kn-setup
 
-unalias ns kc pod kp kpw kd kn ks kr kcm kb ke kew kl kf 2>/dev/null
 ns() { [ $# -eq 0 ] && echo "Current namespace: $ns" || { export ns=$1; k config set-context --current --namespace=$1; }; }
 kc() { [ $# -eq 0 ] && k config get-contexts || { k config use-context $1; export ns=$(kubectl config view --minify -o jsonpath='{..namespace}' 2>/dev/null); export ns=${ns:-default}; }; }
 pod() { k get pods -n $ns | awk "/$1/{print \$1}" | head -1; }
