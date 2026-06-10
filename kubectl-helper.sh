@@ -4,7 +4,7 @@ case "$_CURRENT_SHELL" in zsh|bash) ;; *) echo "k8s: requires bash or zsh" >&2; 
 
 export ns=$(kubectl config view --minify -o jsonpath='{..namespace}' 2>/dev/null)
 export ns=${ns:-default}
-alias k=kubectl
+k() { kubectl "$@"; }
 
 eval "$(k completion $_CURRENT_SHELL)"
 

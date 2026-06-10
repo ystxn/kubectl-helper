@@ -46,7 +46,7 @@ completion is wired up for the relevant resource type of each command.
 
 | Command | Usage | What it does |
 |---------|-------|--------------|
-| `k` | `k <args>` | Alias for `kubectl`. |
+| `k` | `k <args>` | Shorthand for `kubectl` (a function, so it also works in non-interactive shells). |
 | `ns` | `ns` / `ns <namespace>` | With no args, prints the current namespace. With an argument, switches the current context to that namespace (and updates the `$ns` used by every other command). |
 | `kc` | `kc` / `kc <context>` | With no args, lists kube contexts. With an argument, switches to that context and refreshes the active namespace. |
 | `pod` | `pod <substr>` | Prints the name of the **first** pod matching the substring. Used internally by other commands, but handy on its own. |
