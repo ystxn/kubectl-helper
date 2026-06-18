@@ -1,5 +1,5 @@
 # https://github.com/ystxn/kubectl-helper
-_CURRENT_SHELL=$(ps -p $$ -o comm=)
+_CURRENT_SHELL=$(ps -p $$ -o comm=| tr -d '-')
 case "$_CURRENT_SHELL" in zsh|bash) ;; *) echo "k8s: requires bash or zsh" >&2; return 2>/dev/null || exit 1 ;; esac
 
 export ns=$(kubectl config view --minify -o jsonpath='{..namespace}' 2>/dev/null)
@@ -12,7 +12,7 @@ eval "$(k completion $_CURRENT_SHELL)"
 
 case "$_CURRENT_SHELL" in
   zsh)
-    compdef k=kubectl   # k is a function now, so it needs kubectl completion wired up explicitly
+    compdef k=kubectl
     _k8s_completion() {
       local -a resources
       resources=($(kubectl get $1 -n $ns --no-headers | awk '{print $1}'))
@@ -38,7 +38,23 @@ case "$_CURRENT_SHELL" in
     compdef '_k8s_context_completion' kc
     ;;
   bash)
-    complete -o default -F __start_kubectl k   # k is a function now, so it needs kubectl completion wired up explicitly
+    # Fallback for when bash-completion package is not installed
+    if ! declare -F _get_comp_words_by_ref >/dev/null 2>&1; then
+      _get_comp_words_by_ref() {
+        local flag OPTIND=1 OPTARG var
+        while getopts "c:i:n:p:w:" flag "$@"; do :; done
+        shift $((OPTIND - 1))
+        for var in "$@"; do
+          case $var in
+            cur)   printf -v cur   %s "${COMP_WORDS[COMP_CWORD]}" ;;
+            prev)  printf -v prev  %s "${COMP_WORDS[COMP_CWORD-1]}" ;;
+            words) eval "words=(\"\${COMP_WORDS[@]}\")" ;;
+            cword) printf -v cword %s "$COMP_CWORD" ;;
+          esac
+        done
+      }
+    fi
+    complete -o default -F __start_kubectl k
     _k8s_completion() {
       local resources
       resources=$(kubectl get $1 -n $ns --no-headers 2>/dev/null | awk '{print $1}')
