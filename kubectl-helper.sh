@@ -1,6 +1,9 @@
+# source <(curl -s https://k.yong.space)
 # https://github.com/ystxn/kubectl-helper
-_CURRENT_SHELL=$(ps -p $$ -o comm=| tr -d '-')
-case "$_CURRENT_SHELL" in zsh|bash) ;; *) echo "k8s: requires bash or zsh" >&2; return 2>/dev/null || exit 1 ;; esac
+if [ -n "$ZSH_VERSION" ]; then _CURRENT_SHELL=zsh
+elif [ -n "$BASH_VERSION" ]; then _CURRENT_SHELL=bash
+else echo "k8s: requires bash or zsh" >&2; return 2>/dev/null || exit 1
+fi
 
 export ns=$(kubectl config view --minify -o jsonpath='{..namespace}' 2>/dev/null)
 export ns=${ns:-default}
